@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/app.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="PakePlus - 将网站秒变桌面应用和手机应用，开源免费打包工具，支持 Windows/macOS/Linux/Android/iOS"
+        />
+        <meta
+            name="keywords"
+            content="PakePlus,网页打包,桌面应用,手机应用,Tauri,跨平台,开源,打包工具,web to app"
+        />
+        <meta
+            property="og:title"
+            content="PakePlus - 网站秒变桌面应用和手机应用"
+        />
+        <meta
+            property="og:description"
+            content="开源免费打包工具，将 HTML/网页/Vue/React 项目打包为跨平台桌面和手机应用"
+        />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <script src="/vconsole.min.js"></script>
+        <title>PakePlus - 网站秒变桌面应用和手机应用</title>
+    </head>
+
+    <body>
+        <div id="app"></div>
+        <script type="module" src="/src/main.ts"></script>
+    </body>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="referrer" content="no-referrer">
+    <title>好想背单词 - 沉浸式单词记忆</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg-gradient-start: #667eea;
+            --bg-gradient-end: #764ba2;
+            --card-bg: white;
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            --border-light: #e2e8f0;
+            --shadow-color: rgba(0,0,0,0.1);
+            --stat-bg: #f7fafc;
+            --input-border: #e2e8f0;
+            --input-focus: #667eea;
+            --toggle-bg: #e2e8f0;
+            --leaderboard-gold: #fbbf24;
+            --leaderboard-silver: #9ca3af;
+            --leaderboard-bronze: #cd7f32;
+        }
+
+        body.dark-mode {
+            --bg-gradient-start: #1a202c;
+            --bg-gradient-end: #2d3748;
+            --card-bg: #2d3748;
+            --text-primary: #f7fafc;
+            --text-secondary: #e2e8f0;
+            --text-muted: #a0aec0;
+            --border-light: #4a5568;
+            --shadow-color: rgba(0,0,0,0.5);
+            --stat-bg: #1a202c;
+            --input-border: #4a5568;
+            --input-focus: #9f7aea;
+            --toggle-bg: #4a5568;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            transition: background 0.3s ease, color 0.2s ease;
+        }
+
+        body.show-main-bg {
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        body.show-main-bg .card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(2px);
+        }
+        body.dark-mode.show-main-bg .card {
+            background: rgba(30, 32, 44, 0.92);
+        }
+
+        body.study-mode, body.flashcard-mode {
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        body.study-mode .card, body.flashcard-mode .card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(2px);
+        }
+        body.dark-mode.study-mode .card, body.dark-mode.flashcard-mode .card {
+            background: rgba(30, 32, 44, 0.92);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .theme-switch-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            background: var(--card-bg);
+            border: none;
+            border-radius: 40px;
+            padding: 10px 16px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(4px);
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px var(--shadow-color);
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            margin: 5px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-success { background: #48bb78; color: white; }
+        .btn-danger { background: #f56565; color: white; }
+        .btn-warning { background: #ed8936; color: white; }
+        .btn-secondary { background: #e2e8f0; color: #4a5568; }
+        body.dark-mode .btn-secondary { background: #4a5568; color: #e2e8f0; }
+        .word-text {
+            font-size: 3em;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .pronounce-btn {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 0 8px;
+        }
+        .word-meaning { font-size: 1.5em; color: var(--text-secondary); background: var(--stat-bg); border-radius: 10px; padding: 20px; margin-top: 20px; }
+        .progress-bar { width: 100%; height: 10px; background: var(--border-light); border-radius: 5px; overflow: hidden; margin: 20px 0; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); transition: width 0.3s; }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--stat-bg);
+            border-radius: 10px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .stat-value { font-size: 1.5em; font-weight: bold; color: #667eea; }
+        .hidden { display: none !important; }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 2000;
+            transform: translateX(400px);
+            transition: 0.3s;
+            color: var(--text-primary);
+        }
+        .notification.show { transform: translateX(0); }
+        .flashcard-card {
+            cursor: pointer;
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            touch-action: pan-y pinch-zoom;
+        }
+        .flashcard-nav {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .bg-switch-btn {
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 40px;
+            font-size: 13px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: nowrap;
+        }
+        .difficulty-btn {
+            flex: 1;
+            max-width: 140px;
+            padding: 12px 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .difficulty-btn.known { background: #48bb78; color: white; }
+        .difficulty-btn.hard { background: #ed8936; color: white; }
+        .difficulty-btn.unknown { background: #f56565; color: white; }
+        .modal {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
+            z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s;
+        }
+        .modal.show { opacity: 1; visibility: visible; }
+        .modal-content {
+            background: var(--card-bg); padding: 30px; border-radius: 20px;
+            max-width: 500px; width: 90%; color: var(--text-primary);
+        }
+        .wordbook-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
+        .wordbook-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px; border-radius: 15px; cursor: pointer;
+        }
+        body.dark-mode .wordbook-card { background: #2d3748; }
+        .background-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .background-item {
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 12px;
+            background: var(--card-bg);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .background-preview {
+            width: 100%;
+            height: 100px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+            background-color: var(--stat-bg);
+        }
+        .background-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .background-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            flex: 1;
+        }
+        .background-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .background-actions button {
+            margin: 0;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .leaderboard-container {
+            background: var(--stat-bg);
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .leaderboard-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 4px solid #fbbf24;
+            padding-left: 12px;
+        }
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: var(--card-bg);
+            border-radius: 40px;
+            box-shadow: 0 1px 2px var(--shadow-color);
+        }
+        .leaderboard-rank {
+            width: 36px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .leaderboard-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 2;
+        }
+        .leaderboard-avatar { font-size: 1.6rem; }
+        .leaderboard-name { font-weight: 500; }
+        .leaderboard-count {
+            font-weight: bold;
+            background: var(--stat-bg);
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+        .gold-rank { color: var(--leaderboard-gold); }
+        .silver-rank { color: var(--leaderboard-silver); }
+        .bronze-rank { color: var(--leaderboard-bronze); }
+        .setting-item {
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 15px;
+        }
+        .setting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .toggle-btn {
+            width: 60px;
+            height: 30px;
+            background: var(--toggle-bg);
+            border-radius: 30px;
+            cursor: pointer;
+            position: relative;
+        }
+        .toggle-btn.active { background: #48bb78; }
+        .toggle-btn::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+        }
+        .toggle-btn.active::after { transform: translateX(30px); }
+        .input-group { margin-top: 10px; }
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--input-border);
+            border-radius: 10px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+        .spelling-input {
+            font-size: 1.5rem;
+            padding: 12px;
+            text-align: center;
+            width: 100%;
+            border-radius: 12px;
+            border: 2px solid var(--input-border);
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+        .group-size-setting {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .group-size-setting input {
+            font-size: 16px;
+            padding: 8px;
+            width: 80px;
+            border-radius: 8px;
+            border: 2px solid var(--input-border);
+            background: var(--card-bg);
+            color: var(--text-primary);
+        }
+        .bg-add-form {
+            display: flex;
+            gap: 12px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .bg-add-form input {
+            flex: 1;
+            min-width: 150px;
+            font-size: 16px;
+        }
+        @media (max-width: 600px) {
+            .word-text { font-size: 2em; }
+            .background-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📖 好想背单词</h1>
+        <p>沉浸式记忆 · 科学复习 · 真人发音</p>
+    </div>
+
+    <!-- 主菜单 -->
+    <div id="mainMenu" class="card">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <button class="btn btn-primary" onclick="showCreateWordbook()">📚 创建新单词本</button>
+            <button class="btn btn-secondary" onclick="showSettings()">⚙️ 全局设置</button>
+        </div>
+        <h2>我的单词本</h2>
+        <div id="wordbookList" class="wordbook-grid"></div>
+        <div id="emptyState" class="hidden" style="text-align:center;">📖 还没有单词本，点击上方创建</div>
+    </div>
+
+    <!-- 创建单词本 -->
+    <div id="createWordbook" class="card hidden">
+        <button class="btn btn-secondary" onclick="showMainMenu()">← 返回</button>
+        <h2>创建新单词本</h2>
+        <div class="input-group"><label>单词本名称</label><input type="text" id="newWordbookName" placeholder="例如：四级词汇"></div>
+        <div class="input-group"><label>导入单词 (单词｜释义｜音标｜例句)</label><textarea id="wordInput" rows="6" placeholder="apple｜苹果｜/ˈæpl/｜I eat an apple."></textarea></div>
+        <button class="btn btn-primary" onclick="createWordbook()">创建并导入</button>
+    </div>
+
+    <!-- 单词本详情 -->
+    <div id="wordbookDetail" class="card hidden">
+        <button class="btn btn-secondary" onclick="showMainMenu()">← 返回</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <h2 id="currentWordbookTitle">单词本名称</h2>
+            <div>
+                <button class="btn btn-primary" onclick="showAddWords()">➕ 添加单词</button>
+                <button class="btn btn-success" onclick="startStudy()">▶️ 开始学习</button>
+                <button class="btn btn-warning" onclick="startEmergencyReview()">⚡ 应急复习</button>
+                <button class="btn btn-info" onclick="startFlashcardMode()">📇 单词卡模式</button>
+            </div>
+        </div>
+        <div class="group-size-setting">
+            <span>📦 每组单词数量：</span>
+            <input type="number" id="groupSizeInput" min="1" max="50" value="10" step="1">
+            <button class="btn btn-secondary" onclick="updateGroupSize()">保存设置</button>
+        </div>
+        <div class="stats">
+            <div><div class="stat-value" id="totalWords">0</div><div>总单词</div></div>
+            <div><div class="stat-value" id="learnedWords">0</div><div>已掌握</div></div>
+            <div><div class="stat-value" id="reviewWords">0</div><div>待复习</div></div>
+        </div>
+        <div id="leaderboardContainer" class="leaderboard-container"></div>
+        <h3>单词列表</h3>
+        <div id="wordList"></div>
+    </div>
+
+    <!-- 添加单词 -->
+    <div id="addWords" class="card hidden">
+        <button class="btn btn-secondary" onclick="backToWordbook()">← 返回</button>
+        <h2>添加单词</h2>
+        <textarea id="additionalWordInput" rows="6" placeholder="单词｜释义｜音标｜例句"></textarea>
+        <button class="btn btn-primary" onclick="addWordsToCurrentBook()">添加</button>
+    </div>
+
+    <!-- 学习模式 -->
+    <div id="studyMode" class="card hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <button class="btn btn-secondary" onclick="endStudy()">✕ 结束学习</button>
+            <div><span id="studyGroupInfo">第1组 · 0/10</span>
+                <button class="bg-switch-btn" onclick="cycleStudyBackground()">🎨 背景</button>
+            </div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="studyProgressBar" style="width:0%"></div></div>
+        <div class="word-text">
+            <span id="studyWord">Word</span>
+            <button class="pronounce-btn" onclick="speakCurrentWord()">🔊</button>
+        </div>
+        <div class="word-phonetic" id="studyPhonetic"></div>
+        <div id="meaningSection" style="display: none;">
+            <div class="word-meaning" id="studyMeaning"></div>
+            <div class="word-example" id="studyExample" style="margin-top:10px; font-style:italic;"></div>
+            <div class="difficulty-selector">
+                <button class="difficulty-btn known" onclick="confirmKnowledge('known')">✓ 认识</button>
+                <button class="difficulty-btn hard" onclick="confirmKnowledge('hard')">! 困难</button>
+                <button class="difficulty-btn unknown" onclick="confirmKnowledge('unknown')">✗ 不认识</button>
+            </div>
+        </div>
+        <div id="initialButtons" class="difficulty-selector">
+            <button class="btn btn-success" onclick="showMeaning()">✓ 认识</button>
+            <button class="btn btn-warning" onclick="showMeaning()">! 困难</button>
+            <button class="btn btn-danger" onclick="showMeaning()">✗ 不认识</button>
+        </div>
+    </div>
+
+    <!-- 拼写测试 -->
+    <div id="spellingMode" class="card hidden">
+        <div style="text-align:center;"><h2>✍️ 拼写测试</h2><p>请根据释义拼写单词（必须正确才能继续）</p></div>
+        <div class="spelling-section">
+            <div class="spelling-header" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px;">
+                <span>🔊 单词发音：</span>
+                <button class="pronounce-btn" onclick="speakSpellingWord()">🔊</button>
+            </div>
+            <div style="font-size:1.2rem;">释义：</div>
+            <div id="spellingMeaning" style="font-size:1.8rem; font-weight:600; padding:20px; background:var(--stat-bg); border-radius:10px; margin:10px 0;"></div>
+            <input type="text" id="spellingInput" class="spelling-input" placeholder="输入单词拼写" autocomplete="off">
+            <div id="correctSpellingDisplay" style="display:none; margin:10px 0; padding:10px; background:#fef5e7; border-radius:8px;"></div>
+            <div id="spellingButtons" style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="checkSpelling()">提交</button>
+                <button class="btn btn-secondary" onclick="showSpellingHint()">提示</button>
+            </div>
+            <div id="spellingRetryButtons" class="hidden" style="text-align:center; margin-top:20px;">
+                <button class="btn btn-warning" onclick="retrySpelling()">重新输入</button>
+            </div>
+        </div>
+        <div style="text-align:center; margin-top:20px;">进度：<span id="spellingProgress">1/5</span></div>
+    </div>
+
+    <!-- 单词卡模式 -->
+    <div id="flashcardMode" class="card hidden flashcard-card">
+        <div style="display: flex; justify-content: space-between;">
+            <button class="btn btn-secondary" onclick="exitFlashcardMode()">← 返回</button>
+            <div><span id="flashcardProgress">1/10</span>
+                <button class="bg-switch-btn" onclick="cycleFlashcardBackground()">🎨 背景</button>
+            </div>
+        </div>
+        <div class="word-text" style="margin-top: 30px;">
+            <span id="flashcardWord">Word</span>
+            <button class="pronounce-btn" onclick="speakFlashcardWord()">🔊</button>
+        </div>
+        <div class="word-phonetic" id="flashcardPhonetic"></div>
+        <div class="word-meaning" id="flashcardMeaning">释义</div>
+        <div class="word-example" id="flashcardExample" style="margin-top:15px; background:var(--stat-bg); padding:10px; border-radius:12px;"></div>
+        <div class="flashcard-nav">
+            <button class="btn btn-secondary" id="prevFlashcardBtn" onclick="event.stopPropagation(); prevFlashcard();">◀ 上一个</button>
+            <button class="btn btn-primary" id="nextFlashcardBtn" onclick="event.stopPropagation(); nextFlashcard();">下一个 ▶</button>
+        </div>
+        <div style="text-align: center; margin-top: 15px;">👆 左右滑动卡片切换</div>
+    </div>
+
+    <!-- 全局设置 -->
+    <div id="settings" class="card hidden">
+        <button class="btn btn-secondary" onclick="showMainMenu()">← 返回</button>
+        <h2>全局设置</h2>
+        <div class="setting-item">
+            <div class="setting-header">
+                <div><div class="setting-title">✍️ 拼写测试</div><div class="setting-desc">学习一定数量单词后触发拼写练习</div></div>
+                <div class="toggle-switch"><span id="spellingToggleText">关闭</span><div id="spellingToggleBtn" class="toggle-btn" onclick="toggleSetting('spellingEnabled')"></div></div>
+            </div>
+            <div id="spellingSettings" class="hidden"><div class="input-group"><label>每学习多少个单词触发拼写测试</label><input type="number" id="spellingInterval" value="5" min="1" max="50" step="1"></div></div>
+        </div>
+        <div class="setting-item">
+            <div class="setting-header">
+                <div><div class="setting-title">⏰ 定时复习提醒</div><div class="setting-desc">根据艾宾浩斯遗忘曲线提醒复习</div></div>
+                <div class="toggle-switch"><span id="reviewToggleText">开启</span><div id="reviewToggleBtn" class="toggle-btn active" onclick="toggleSetting('reviewEnabled')"></div></div>
+            </div>
+        </div>
+        <div class="setting-item">
+            <div class="setting-header">
+                <div><div class="setting-title">🖼️ 主菜单显示背景</div><div class="setting-desc">开启后主菜单也展示学习背景图</div></div>
+                <div class="toggle-switch"><span id="mainBgToggleText">关闭</span><div id="mainBgToggleBtn" class="toggle-btn" onclick="toggleSetting('mainMenuBackground')"></div></div>
+            </div>
+        </div>
+        <div class="setting-item">
+            <div class="setting-title">🖼️ 学习背景管理</div>
+            <div id="backgroundList" class="background-grid"></div>
+            <div class="bg-add-form">
+                <input type="text" id="newBgName" placeholder="背景名称 (例如：海边日落)">
+                <input type="text" id="newBgUrl" placeholder="图片URL (https://...)">
+                <button class="btn btn-primary" onclick="addBackground()">➕ 添加背景</button>
+            </div>
+            <small style="color: var(--text-muted); display: block; margin-top: 8px;">提示：可使用 Pixabay、Unsplash 等免费图库的高清链接</small>
+        </div>
+        <div class="setting-item">
+            <div class="setting-title">💾 数据管理</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+                <button class="btn btn-primary" onclick="exportData()">📥 导出</button>
+                <button class="btn btn-secondary" onclick="document.getElementById('importFile').click()">📤 导入</button>
+                <button class="btn btn-danger" onclick="clearAllData()">🗑️ 清空</button>
+                <input type="file" id="importFile" style="display:none;" accept=".json" onchange="importData(this)">
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+    <div id="editWordModal" class="modal"><div class="modal-content"><h2>编辑单词</h2><input id="editWordText" placeholder="单词"><input id="editWordMeaning" placeholder="释义"><input id="editWordPhonetic" placeholder="音标"><input id="editWordExample" placeholder="例句"><button class="btn btn-primary" onclick="saveWordEdit()">保存</button><button class="btn btn-secondary" onclick="closeModal('editWordModal')">取消</button></div></div>
+    <div id="renameModal" class="modal"><div class="modal-content"><h2>重命名</h2><input id="newWordbookNameInput" placeholder="新名称"><button class="btn btn-primary" onclick="saveRename()">保存</button><button class="btn btn-secondary" onclick="closeModal('renameModal')">取消</button></div></div>
+    <div id="editBackgroundModal" class="modal"><div class="modal-content"><h2>编辑背景</h2><input id="editBgName"><input id="editBgUrl"><div id="bgPreview" style="height:150px; background-size:cover;"></div><button class="btn btn-primary" onclick="saveBackgroundEdit()">保存</button><button class="btn btn-secondary" onclick="closeModal('editBackgroundModal')">取消</button></div></div>
+</div>
+<button id="themeToggleBtn" class="theme-switch-btn">🌓 切换主题</button>
+
+<script>
+    // ---------- 数据 ----------
+    let data = { 
+        wordbooks: [], 
+        settings: { 
+            spellingEnabled: false, 
+            spellingInterval: 5, 
+            reviewEnabled: true, 
+            backgrounds: [], 
+            currentBgIndex: 0,
+            mainMenuBackground: false
+        }, 
+        dailyStats: null 
+    };
+    let currentWordbookId = null;
+    let studyGroups = [], currentGroupIdx = 0, currentGroupWords = [], currentWordIdxInGroup = 0;
+    let knownWordsCount = 0;
+    let spellingQueue = [], currentSpellingIndex = 0;
+    let editingWordId = null, renamingWordbookId = null, editingBackgroundId = null;
+    let flashcardWords = [], flashcardIndex = 0;
+    let flashcardTouchStartX = 0, flashcardTouchStartY = 0;
+    let isEmergencyReview = false;   // 区分普通学习与应急复习，避免应急复习刷排行榜
+
+    // 机器人配置
+    const ROBOTS = {
+        haohao: { name: "昊昊", avatar: "🐶", min: 30, max: 45, key: "haohao" },
+        xiangxiang: { name: "香香", avatar: "🐱", min: 21, max: 35, key: "xiangxiang" },
+        beibei: { name: "贝贝", avatar: "🐹", min: 15, max: 25, key: "beibei" }
+    };
+    const CELEBRATION_MSG = {
+        haohao: "你真棒汪🐶",
+        xiangxiang: "人，你真好学喵🐱",
+        beibei: "被超越了叽🐹"
+    };
+
+    function getTodayStr() { return new Date().toLocaleDateString('en-CA'); }
+    function initDailyStats() {
+        const today = getTodayStr();
+        if (!data.dailyStats || data.dailyStats.date !== today) {
+            const robotStats = {
+                haohao: Math.floor(Math.random() * (ROBOTS.haohao.max - ROBOTS.haohao.min + 1) + ROBOTS.haohao.min),
+                xiangxiang: Math.floor(Math.random() * (ROBOTS.xiangxiang.max - ROBOTS.xiangxiang.min + 1) + ROBOTS.xiangxiang.min),
+                beibei: Math.floor(Math.random() * (ROBOTS.beibei.max - ROBOTS.beibei.min + 1) + ROBOTS.beibei.min)
+            };
+            data.dailyStats = { date: today, userCount: 0, robotStats: robotStats, notified: { haohao: false, xiangxiang: false, beibei: false } };
+            saveData();
+        }
+        if (!data.dailyStats.notified) data.dailyStats.notified = { haohao: false, xiangxiang: false, beibei: false };
+        if (!data.dailyStats.robotStats) {
+            data.dailyStats.robotStats = { haohao: 35, xiangxiang: 28, beibei: 20 };
+            saveData();
+        }
+    }
+    function updateUserDailyCount(increment) {
+        initDailyStats();
+        data.dailyStats.userCount += increment;
+        saveData();
+        checkAndNotifyNewRecords();
+        renderLeaderboard();
+    }
+    function checkAndNotifyNewRecords() {
+        const user = data.dailyStats.userCount;
+        const robotStats = data.dailyStats.robotStats;
+        const notified = data.dailyStats.notified;
+        let needSave = false;
+        for (let robot of Object.values(ROBOTS)) {
+            const key = robot.key;
+            if (user > robotStats[key] && !notified[key]) {
+                showNotification(CELEBRATION_MSG[key]);
+                notified[key] = true;
+                needSave = true;
+            }
+        }
+        if (needSave) saveData();
+    }
+    function renderLeaderboard() {
+        const container = document.getElementById('leaderboardContainer');
+        if (!container) return;
+        initDailyStats();
+        const userEntry = { name: "我", avatar: "👤", count: data.dailyStats.userCount };
+        const robotEntries = [
+            { name: ROBOTS.haohao.name, avatar: ROBOTS.haohao.avatar, count: data.dailyStats.robotStats.haohao },
+            { name: ROBOTS.xiangxiang.name, avatar: ROBOTS.xiangxiang.avatar, count: data.dailyStats.robotStats.xiangxiang },
+            { name: ROBOTS.beibei.name, avatar: ROBOTS.beibei.avatar, count: data.dailyStats.robotStats.beibei }
+        ];
+        let all = [userEntry, ...robotEntries];
+        all.sort((a,b) => b.count - a.count);
+        const medals = ["🥇", "🥈", "🥉"];
+        const html = `<div class="leaderboard-title">🏆 今日背单词排行榜 🏆</div><div class="leaderboard-list">` +
+            all.map((item, idx) => `<div class="leaderboard-item"><span class="leaderboard-rank ${idx===0?'gold-rank':idx===1?'silver-rank':idx===2?'bronze-rank':''}">${idx<3?medals[idx]:idx+1}</span><div class="leaderboard-user"><span class="leaderboard-avatar">${item.avatar}</span><span>${item.name}</span></div><div class="leaderboard-count">${item.count} 词</div></div>`).join('') +
+            `</div><div style="font-size:12px; text-align:center; margin-top:8px;">每天随机生成机器人背词量，超越它们有惊喜~</div>`;
+        container.innerHTML = html;
+    }
+
+    // 语音模块
+    let speechActivated = false, preferredVoice = null;
+    function activateSpeech() {
+        if (speechActivated) return;
+        if (!window.speechSynthesis) return;
+        const silent = new SpeechSynthesisUtterance('');
+        silent.volume = 0;
+        window.speechSynthesis.speak(silent);
+        window.speechSynthesis.cancel();
+        speechActivated = true;
+    }
+    function speakText(text) {
+        if (!text) return;
+        if (!speechActivated && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) activateSpeech();
+        try { window.speechSynthesis.cancel(); } catch(e) {}
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.9;
+        if (preferredVoice) utterance.voice = preferredVoice;
+        else { const voices = window.speechSynthesis.getVoices(); const enVoice = voices.find(v => v.lang === 'en-US'); if (enVoice) utterance.voice = enVoice; }
+        window.speechSynthesis.speak(utterance);
+    }
+    function speakCurrentWord() { const w = document.getElementById('studyWord').innerText; if(w && w!=='Word') speakText(w); }
+    function speakFlashcardWord() { const w = document.getElementById('flashcardWord').innerText; if(w && w!=='Word') speakText(w); }
+    function speakSpellingWord() { if(spellingQueue.length && currentSpellingIndex < spellingQueue.length) speakText(spellingQueue[currentSpellingIndex].word); }
+
+    // 背景管理
+    const DEFAULT_BG = [
+        { id:0, name:"静谧森林", url:"https://cdn.pixabay.com/photo/2022/07/09/18/14/forest-7311484_1280.jpg" },
+        { id:1, name:"可爱猫咪", url:"https://cdn.pixabay.com/photo/2024/03/07/10/38/simba-8618301_1280.jpg" },
+        { id:2, name:"专注图书馆", url:"https://cdn.pixabay.com/photo/2016/02/16/21/07/christmas-background-1204029_1280.jpg" },
+        { id:3, name:"温馨床铺", url:"https://cdn.pixabay.com/photo/2016/11/21/16/21/bed-1846251_1280.jpg" },
+        { id:4, name:"怡神草原", url:"https://cdn.pixabay.com/photo/2023/02/23/10/59/field-7808525_1280.jpg" }
+    ];
+    function initBackgrounds() { if(!data.settings.backgrounds || data.settings.backgrounds.length===0) data.settings.backgrounds = [...DEFAULT_BG]; saveData(); }
+    function renderBackgrounds() {
+        let container = document.getElementById('backgroundList');
+        if(!container) return;
+        container.innerHTML = data.settings.backgrounds.map((bg, i) => `
+            <div class="background-item">
+                <div class="background-preview" style="background-image: url('${bg.url}');"></div>
+                <div class="background-info">
+                    <span class="background-name">${escapeHtml(bg.name)}</span>
+                    <div class="background-actions">
+                        <button class="btn btn-secondary" onclick="useBackground(${i})">使用</button>
+                        ${bg.id !== 0 ? `<button class="btn btn-danger" onclick="deleteBackground(${bg.id})">删除</button>` : ''}
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+    function useBackground(i){ 
+        data.settings.currentBgIndex=i; 
+        saveData(); 
+        applyBackgroundByMode(); 
+        renderBackgrounds(); 
+        showNotification(`已切换背景: ${data.settings.backgrounds[i].name}`);
+    }
+    function deleteBackground(id){ 
+        if(id===0) return; 
+        data.settings.backgrounds=data.settings.backgrounds.filter(b=>b.id!==id); 
+        if(data.settings.currentBgIndex>=data.settings.backgrounds.length) data.settings.currentBgIndex=0; 
+        saveData(); 
+        renderBackgrounds(); 
+        applyBackgroundByMode(); 
+    }
+    function applyBackgroundByMode() {
+        let bg = data.settings.backgrounds[data.settings.currentBgIndex];
+        if(!bg) return;
+        if(document.body.classList.contains('study-mode') || document.body.classList.contains('flashcard-mode')) {
+            document.body.style.backgroundImage = `url(${bg.url})`;
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'center';
+            document.body.style.backgroundAttachment = 'fixed';
+        } else if(document.body.classList.contains('show-main-bg') && data.settings.mainMenuBackground) {
+            document.body.style.backgroundImage = `url(${bg.url})`;
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'center';
+            document.body.style.backgroundAttachment = 'fixed';
+        } else {
+            document.body.style.backgroundImage = '';
+            document.body.style.background = '';
+        }
+    }
+    function setMainMenuBackground(enable) {
+        if(enable) {
+            document.body.classList.add('show-main-bg');
+            applyBackgroundByMode();
+        } else {
+            document.body.classList.remove('show-main-bg');
+            document.body.style.backgroundImage = '';
+            document.body.style.background = '';
+        }
+    }
+    function cycleStudyBackground() { 
+        data.settings.currentBgIndex = (data.settings.currentBgIndex+1) % data.settings.backgrounds.length; 
+        saveData(); 
+        applyBackgroundByMode(); 
+        showNotification(`背景:${data.settings.backgrounds[data.settings.currentBgIndex].name}`);
+    }
+    function cycleFlashcardBackground() { cycleStudyBackground(); }
+    function addBackground(){
+        let name = document.getElementById('newBgName').value.trim();
+        let url = document.getElementById('newBgUrl').value.trim();
+        if(!name||!url){ showNotification('请填写完整名称和URL'); return; }
+        try{ new URL(url); } catch(e){ showNotification('URL格式无效'); return; }
+        data.settings.backgrounds.push({id:Date.now(), name, url});
+        saveData(); renderBackgrounds();
+        document.getElementById('newBgName').value=''; document.getElementById('newBgUrl').value='';
+        showNotification(`背景"${name}"已添加`);
+    }
+
+    // 保存加载
+    function saveData() { localStorage.setItem('haoxiangbeidanci_data', JSON.stringify(data)); }
+    function loadData() { 
+        let s = localStorage.getItem('haoxiangbeidanci_data'); 
+        if(s) { 
+            data = JSON.parse(s); 
+            if(!data.settings) data.settings={spellingEnabled:false,spellingInterval:5,reviewEnabled:true,backgrounds:[],currentBgIndex:0, mainMenuBackground:false}; 
+            if(!data.settings.backgrounds) data.settings.backgrounds=[];
+            if(data.settings.mainMenuBackground === undefined) data.settings.mainMenuBackground = false;
+        } else { 
+            data.settings.backgrounds = [...DEFAULT_BG]; 
+            data.settings.mainMenuBackground = false;
+        } 
+        // 兼容旧数据：为已掌握但无 lastKnownAt 的单词补一个时间，避免拼写测试遗漏
+        if (data.wordbooks) {
+            data.wordbooks.forEach(book => {
+                if (book.words) {
+                    book.words.forEach(w => {
+                        if (w.status === 'mastered' && !w.lastKnownAt) {
+                            w.lastKnownAt = new Date(0).toISOString(); // 视为很老，排后面
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    // 单词本CRUD
+    function showMainMenu() { 
+        hideAll(); 
+        document.getElementById('mainMenu').classList.remove('hidden'); 
+        renderWordbooks(); 
+        setMainMenuBackground(data.settings.mainMenuBackground);
+    }
+    function hideAll() { 
+        document.querySelectorAll('.card').forEach(c=>c.classList.add('hidden')); 
+        document.body.classList.remove('study-mode','flashcard-mode');
+        if(!data.settings.mainMenuBackground) {
+            document.body.classList.remove('show-main-bg');
+            document.body.style.backgroundImage = '';
+            document.body.style.background = '';
+        } else {
+            document.body.classList.add('show-main-bg');
+            applyBackgroundByMode();
+        }
+    }
+    function showCreateWordbook() { hideAll(); document.getElementById('createWordbook').classList.remove('hidden'); setMainMenuBackground(false); }
+    function showWordbookDetail(id) { currentWordbookId = id; hideAll(); document.getElementById('wordbookDetail').classList.remove('hidden'); renderWordbookDetail(); renderLeaderboard(); loadGroupSizeUI(); setMainMenuBackground(false); }
+    function showAddWords() { hideAll(); document.getElementById('addWords').classList.remove('hidden'); setMainMenuBackground(false); }
+    function backToWordbook() { showWordbookDetail(currentWordbookId); }
+    function showSettings() { hideAll(); document.getElementById('settings').classList.remove('hidden'); updateSettingsUI(); renderBackgrounds(); setMainMenuBackground(false); }
+    function parseWordInput(input){ return input.split('\n').filter(l=>l.trim()).map(l=>{let p=l.split('｜');return {word:p[0]?.trim()||'',meaning:p[1]?.trim()||'',phonetic:p[2]?.trim()||'',example:p[3]?.trim()||''};}).filter(w=>w.word&&w.meaning);}
+    function createWordbook(){
+        let name = document.getElementById('newWordbookName').value.trim();
+        if(!name) return;
+        let input = document.getElementById('wordInput').value;
+        let words = parseWordInput(input);
+        let book = { id:Date.now(), name:name, groupSize:10, words:words.map((w,i)=>({ id:Date.now()+i, ...w, status:'new', nextReview:null, reviewCount:0, errorCount:0, lastKnownAt:null })) };
+        data.wordbooks.push(book); saveData(); showMainMenu(); showNotification(`创建成功，导入${words.length}个单词`);
+    }
+    function renderWordbooks() {
+        let container = document.getElementById('wordbookList');
+        if(data.wordbooks.length===0){ container.innerHTML=''; document.getElementById('emptyState').classList.remove('hidden'); return; }
+        document.getElementById('emptyState').classList.add('hidden');
+        container.innerHTML = data.wordbooks.map(b=>`<div class="wordbook-card" onclick="showWordbookDetail(${b.id})"><h3>${escapeHtml(b.name)}</h3><div>单词:${b.words.length}</div><div>掌握:${b.words.filter(w=>w.status==='mastered').length}</div><div>每组:${b.groupSize||10}词</div><button class="btn btn-secondary" onclick="event.stopPropagation();renameWordbook(${b.id})">重命名</button><button class="btn btn-danger" onclick="event.stopPropagation();deleteWordbook(${b.id})">删除</button></div>`).join('');
+    }
+    function renderWordbookDetail() {
+        let book = data.wordbooks.find(b=>b.id===currentWordbookId);
+        if(!book) return;
+        document.getElementById('currentWordbookTitle').innerText = book.name;
+        document.getElementById('totalWords').innerText = book.words.length;
+        document.getElementById('learnedWords').innerText = book.words.filter(w=>w.status==='mastered').length;
+        document.getElementById('reviewWords').innerText = book.words.filter(w=>w.status==='mastered' && w.nextReview && new Date(w.nextReview)<=new Date()).length;
+        let container = document.getElementById('wordList');
+        if(book.words.length===0){ container.innerHTML='暂无单词'; return; }
+        container.innerHTML = book.words.map(w=>`<div><strong>${escapeHtml(w.word)}</strong> ${w.phonetic?`(${escapeHtml(w.phonetic)})`:''}<br>${escapeHtml(w.meaning)}<br><small>${w.example||''}</small><br><button class="btn btn-secondary" onclick="editWord(${w.id})">编辑</button><button class="btn btn-danger" onclick="deleteWord(${w.id})">删除</button><hr></div>`).join('');
+    }
+    function loadGroupSizeUI() {
+        let book = data.wordbooks.find(b=>b.id===currentWordbookId);
+        if(book) document.getElementById('groupSizeInput').value = book.groupSize || 10;
+    }
+    function updateGroupSize() {
+        let book = data.wordbooks.find(b=>b.id===currentWordbookId);
+        if(book) { let newSize = parseInt(document.getElementById('groupSizeInput').value); if(newSize>0) book.groupSize = newSize; else book.groupSize = 10; saveData(); showNotification(`每组单词数量已设为 ${book.groupSize}`); renderWordbooks(); }
+    }
+    function addWordsToCurrentBook(){ let input=document.getElementById('additionalWordInput').value; let words=parseWordInput(input); let book=data.wordbooks.find(b=>b.id===currentWordbookId); words.forEach((w,i)=>book.words.push({id:Date.now()+i,...w,status:'new',nextReview:null,reviewCount:0,errorCount:0,lastKnownAt:null})); saveData(); backToWordbook(); showNotification(`添加${words.length}个单词`); }
+    function deleteWordbook(id){ if(confirm('删除单词本？')){ data.wordbooks=data.wordbooks.filter(b=>b.id!==id); saveData(); showMainMenu(); } }
+    function renameWordbook(id){ renamingWordbookId=id; document.getElementById('newWordbookNameInput').value=data.wordbooks.find(b=>b.id===id).name; openModal('renameModal'); }
+    function saveRename(){ let newName=document.getElementById('newWordbookNameInput').value.trim(); if(newName){ data.wordbooks.find(b=>b.id===renamingWordbookId).name=newName; saveData(); closeModal('renameModal'); renderWordbooks(); showNotification('已重命名'); } }
+    function editWord(id){ let book=data.wordbooks.find(b=>b.id===currentWordbookId); let w=book.words.find(w=>w.id===id); editingWordId=id; document.getElementById('editWordText').value=w.word; document.getElementById('editWordMeaning').value=w.meaning; document.getElementById('editWordPhonetic').value=w.phonetic||''; document.getElementById('editWordExample').value=w.example||''; openModal('editWordModal'); }
+    function saveWordEdit(){ let book=data.wordbooks.find(b=>b.id===currentWordbookId); let w=book.words.find(w=>w.id===editingWordId); w.word=document.getElementById('editWordText').value.trim(); w.meaning=document.getElementById('editWordMeaning').value.trim(); w.phonetic=document.getElementById('editWordPhonetic').value.trim(); w.example=document.getElementById('editWordExample').value.trim(); saveData(); closeModal('editWordModal'); renderWordbookDetail(); }
+    function deleteWord(id){ if(confirm('删除单词？')){ let book=data.wordbooks.find(b=>b.id===currentWordbookId); book.words=book.words.filter(w=>w.id!==id); saveData(); renderWordbookDetail(); } }
+    function escapeHtml(str){ return str.replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    function showNotification(msg){ let n=document.getElementById('notification'); n.textContent=msg; n.classList.add('show'); setTimeout(()=>n.classList.remove('show'),2500); }
+    function openModal(id){ document.getElementById(id).classList.add('show'); }
+    function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+
+    // 学习模式
+    function buildStudyGroups(book) {
+        let now = new Date();
+        let reviewWords = data.settings.reviewEnabled ? book.words.filter(w=>w.status==='mastered' && w.nextReview && new Date(w.nextReview)<=now) : [];
+        let newWords = book.words.filter(w=>w.status!=='mastered');
+        let all = [...reviewWords, ...newWords];
+        let groupSize = book.groupSize || 10;
+        let groups = [];
+        for(let i=0;i<all.length;i+=groupSize){
+            let group = all.slice(i,i+groupSize);
+            for(let j=group.length-1;j>0;j--){ let r=Math.floor(Math.random()*(j+1)); [group[j],group[r]]=[group[r],group[j]]; }
+            groups.push(group);
+        }
+        return groups;
+    }
+    function startStudy() {
+        let book = data.wordbooks.find(b=>b.id===currentWordbookId);
+        let groups = buildStudyGroups(book);
+        if(groups.length===0 || groups.every(g=>g.length===0)){ showNotification('没有需要学习的单词'); return; }
+        studyGroups = groups;
+        currentGroupIdx = 0;
+        currentGroupWords = [...studyGroups[0]];
+        currentWordIdxInGroup = 0;
+        knownWordsCount = 0;
+        spellingQueue = [];
+        currentSpellingIndex = 0;
+        isEmergencyReview = false;
+        hideAll();
+        document.getElementById('studyMode').classList.remove('hidden');
+        document.body.classList.add('study-mode');
+        applyBackgroundByMode();
+        showCurrentStudyWord();
+    }
+    function startEmergencyReview() {
+        let book = data.wordbooks.find(b=>b.id===currentWordbookId);
+        let mastered = book.words.filter(w=>w.status==='mastered');
+        if(mastered.length===0){ showNotification('无已掌握单词'); return; }
+        let groupSize = book.groupSize || 10;
+        let groups = [];
+        for(let i=0;i<mastered.length;i+=groupSize) groups.push(mastered.slice(i,i+groupSize));
+        // 组内打乱
+        groups.forEach(group => {
+            for(let j=group.length-1;j>0;j--){ let r=Math.floor(Math.random()*(j+1)); [group[j],group[r]]=[group[r],group[j]]; }
+        });
+        studyGroups = groups;
+        currentGroupIdx = 0;
+        currentGroupWords = [...studyGroups[0]];
+        currentWordIdxInGroup = 0;
+        knownWordsCount = 0;
+        spellingQueue = [];
+        isEmergencyReview = true;
+        hideAll();
+        document.getElementById('studyMode').classList.remove('hidden');
+        document.body.classList.add('study-mode');
+        applyBackgroundByMode();
+        showCurrentStudyWord();
+        showNotification('应急复习开始');
+    }
+    function showCurrentStudyWord() {
+        if(currentGroupWords.length === 0) {
+            currentGroupIdx++;
+            if(currentGroupIdx >= studyGroups.length) { showNotification('恭喜！所有单词已掌握！'); endStudy(); return; }
+            currentGroupWords = [...studyGroups[currentGroupIdx]];
+            currentWordIdxInGroup = 0;
+        }
+        if(currentWordIdxInGroup >= currentGroupWords.length) currentWordIdxInGroup = 0;
+        let w = currentGroupWords[currentWordIdxInGroup];
+        document.getElementById('studyWord').innerText = w.word;
+        document.getElementById('studyPhonetic').innerText = w.phonetic || '';
+        document.getElementById('studyMeaning').innerText = w.meaning;
+        document.getElementById('studyExample').innerText = w.example || '';
+        document.getElementById('meaningSection').style.display = 'none';
+        document.getElementById('initialButtons').style.display = 'flex';
+        let groupTotal = studyGroups[currentGroupIdx].length;
+        let learnedInGroup = groupTotal - currentGroupWords.length;
+        document.getElementById('studyGroupInfo').innerHTML = `第${currentGroupIdx+1}/${studyGroups.length}组 · ${learnedInGroup}/${groupTotal}`;
+        let overallTotal = studyGroups.flat().length;
+        let overallDone = studyGroups.slice(0,currentGroupIdx).reduce((a,g)=>a+g.length,0) + (groupTotal - currentGroupWords.length);
+        document.getElementById('studyProgressBar').style.width = (overallDone/overallTotal*100)+'%';
+        speakText(w.word);
+    }
+    function showMeaning() { document.getElementById('meaningSection').style.display = 'block'; document.getElementById('initialButtons').style.display = 'none'; }
+    function confirmKnowledge(status) {
+        let book = data.wordbooks.find(b=>b.id===currentWordbookId);
+        let wordObj = currentGroupWords[currentWordIdxInGroup];
+        let realWord = book.words.find(w=>w.id===wordObj.id);
+        if(status === 'known') {
+            realWord.status = 'mastered';
+            realWord.reviewCount++;
+            realWord.lastKnownAt = new Date().toISOString();
+            let next = new Date(); next.setDate(next.getDate()+1);
+            realWord.nextReview = next.toISOString();
+            knownWordsCount++;
+            if (!isEmergencyReview) updateUserDailyCount(1);
+            currentGroupWords.splice(currentWordIdxInGroup,1);
+            if(currentGroupWords.length === 0) currentWordIdxInGroup = 0;
+            else if(currentWordIdxInGroup >= currentGroupWords.length) currentWordIdxInGroup = 0;
+        } else {
+            realWord.status = 'learning';
+            realWord.errorCount++;
+            let moved = currentGroupWords.splice(currentWordIdxInGroup,1)[0];
+            currentGroupWords.push(moved);
+            if(currentWordIdxInGroup >= currentGroupWords.length) currentWordIdxInGroup = 0;
+        }
+        saveData();
+        if(data.settings.spellingEnabled && knownWordsCount > 0 && knownWordsCount % data.settings.spellingInterval === 0) {
+            prepareSpellingTest();
+        } else {
+            showCurrentStudyWord();
+        }
+    }
+    function prepareSpellingTest() {
+        let book = data.wordbooks.find(b=>b.id===currentWordbookId);
+        let mastered = book.words.filter(w => w.status === 'mastered');
+        // 按 lastKnownAt 倒序排列，最近学会的在前（空值视为0，排最后）
+        mastered.sort((a, b) => {
+            const ta = a.lastKnownAt ? new Date(a.lastKnownAt).getTime() : 0;
+            const tb = b.lastKnownAt ? new Date(b.lastKnownAt).getTime() : 0;
+            return tb - ta;
+        });
+        let takeNum = Math.min(data.settings.spellingInterval, mastered.length);
+        if (takeNum === 0) {
+            showCurrentStudyWord();
+            return;
+        }
+        let recentWords = mastered.slice(0, takeNum);
+        // 随机打乱顺序
+        spellingQueue = [...recentWords];
+        for (let i = spellingQueue.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            [spellingQueue[i], spellingQueue[j]] = [spellingQueue[j], spellingQueue[i]];
+        }
+        currentSpellingIndex = 0;
+        hideAll();
+        document.getElementById('spellingMode').classList.remove('hidden');
+        document.body.classList.add('study-mode');
+        applyBackgroundByMode();
+        showSpellingWord();
+    }
+    function showSpellingWord() {
+        if(currentSpellingIndex >= spellingQueue.length) {
+            // 拼写测试完成，重置计数并清空队列，避免循环触发
+            knownWordsCount = 0;
+            spellingQueue = [];
+            currentSpellingIndex = 0;
+            showNotification('拼写测试完成！继续学习~');
+            hideAll();
+            document.getElementById('studyMode').classList.remove('hidden');
+            document.body.classList.add('study-mode');
+            applyBackgroundByMode();
+            showCurrentStudyWord();
+            return;
+        }
+        let w = spellingQueue[currentSpellingIndex];
+        document.getElementById('spellingMeaning').innerText = w.meaning;
+        document.getElementById('spellingInput').value = '';
+        document.getElementById('spellingInput').classList.remove('error');
+        document.getElementById('correctSpellingDisplay').style.display = 'none';
+        document.getElementById('spellingButtons').style.display = 'flex';
+        document.getElementById('spellingRetryButtons').classList.add('hidden');
+        document.getElementById('spellingProgress').innerText = `${currentSpellingIndex+1}/${spellingQueue.length}`;
+        document.getElementById('spellingInput').focus();
+    }
+    function checkSpelling() {
+        let input = document.getElementById('spellingInput').value.trim().toLowerCase();
+        let word = spellingQueue[currentSpellingIndex];
+        if(input === word.word.toLowerCase()) {
+            showNotification('✅ 拼写正确！');
+            currentSpellingIndex++;
+            showSpellingWord();
+        } else {
+            document.getElementById('spellingInput').classList.add('error');
+            let correctDiv = document.getElementById('correctSpellingDisplay');
+            correctDiv.innerHTML = `❌ 错误！正确答案：<strong>${word.word}</strong><br>请重新输入`;
+            correctDiv.style.display = 'block';
+            document.getElementById('spellingButtons').style.display = 'none';
+            document.getElementById('spellingRetryButtons').classList.remove('hidden');
+        }
+    }
+    function showSpellingHint() {
+        let w = spellingQueue[currentSpellingIndex];
+        let hint = w.word.substring(0, Math.ceil(w.word.length/2));
+        document.getElementById('spellingInput').value = hint;
+    }
+    function retrySpelling() {
+        document.getElementById('correctSpellingDisplay').style.display = 'none';
+        document.getElementById('spellingInput').classList.remove('error');
+        document.getElementById('spellingInput').value = '';
+        document.getElementById('spellingButtons').style.display = 'flex';
+        document.getElementById('spellingRetryButtons').classList.add('hidden');
+        document.getElementById('spellingInput').focus();
+    }
+    function endStudy() { 
+        document.body.classList.remove('study-mode'); 
+        isEmergencyReview = false;
+        showWordbookDetail(currentWordbookId); 
+    }
+
+    // 单词卡模式
+    function startFlashcardMode() {
+        let book = data.wordbooks.find(b=>b.id===currentWordbookId);
+        if(!book || book.words.length===0){ showNotification('单词本为空'); return; }
+        flashcardWords = [...book.words];
+        for(let i=flashcardWords.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [flashcardWords[i],flashcardWords[j]]=[flashcardWords[j],flashcardWords[i]]; }
+        flashcardIndex = 0;
+        hideAll();
+        document.getElementById('flashcardMode').classList.remove('hidden');
+        document.body.classList.add('flashcard-mode');
+        applyBackgroundByMode();
+        showFlashcardWord();
+    }
+    function showFlashcardWord() { 
+        if(flashcardWords.length===0) return; 
+        let w=flashcardWords[flashcardIndex]; 
+        document.getElementById('flashcardWord').innerText=w.word; 
+        document.getElementById('flashcardPhonetic').innerText=w.phonetic||''; 
+        document.getElementById('flashcardMeaning').innerText=w.meaning; 
+        document.getElementById('flashcardExample').innerText=w.example||''; 
+        document.getElementById('flashcardProgress').innerText=`${flashcardIndex+1}/${flashcardWords.length}`;
+        speakText(w.word);
+    }
+    function nextFlashcard() { 
+        if(flashcardIndex < flashcardWords.length-1) { 
+            flashcardIndex++; 
+            showFlashcardWord(); 
+        } else { 
+            showNotification('🎉 已是最后一个单词'); 
+        } 
+    }
+    function prevFlashcard() { 
+        if(flashcardIndex > 0) { 
+            flashcardIndex--; 
+            showFlashcardWord(); 
+        } else { 
+            showNotification('🏁 已是第一个单词'); 
+        } 
+    }
+    function exitFlashcardMode() { 
+        document.body.classList.remove('flashcard-mode'); 
+        showWordbookDetail(currentWordbookId); 
+    }
+
+    // 设置界面
+    function updateSettingsUI() {
+        let spellingBtn = document.getElementById('spellingToggleBtn');
+        let reviewBtn = document.getElementById('reviewToggleBtn');
+        let mainBgBtn = document.getElementById('mainBgToggleBtn');
+        let spellingText = document.getElementById('spellingToggleText');
+        let reviewText = document.getElementById('reviewToggleText');
+        let mainBgText = document.getElementById('mainBgToggleText');
+        
+        if(data.settings.spellingEnabled) { spellingBtn.classList.add('active'); spellingText.innerText = '开启'; document.getElementById('spellingSettings').classList.remove('hidden'); }
+        else { spellingBtn.classList.remove('active'); spellingText.innerText = '关闭'; document.getElementById('spellingSettings').classList.add('hidden'); }
+        
+        if(data.settings.reviewEnabled) { reviewBtn.classList.add('active'); reviewText.innerText = '开启'; }
+        else { reviewBtn.classList.remove('active'); reviewText.innerText = '关闭'; }
+        
+        if(data.settings.mainMenuBackground) { mainBgBtn.classList.add('active'); mainBgText.innerText = '开启'; }
+        else { mainBgBtn.classList.remove('active'); mainBgText.innerText = '关闭'; }
+        
+        document.getElementById('spellingInterval').value = data.settings.spellingInterval;
+    }
+    function toggleSetting(key) {
+        if(key === 'spellingEnabled') {
+            data.settings.spellingEnabled = !data.settings.spellingEnabled;
+        } else if(key === 'reviewEnabled') {
+            data.settings.reviewEnabled = !data.settings.reviewEnabled;
+        } else if(key === 'mainMenuBackground') {
+            data.settings.mainMenuBackground = !data.settings.mainMenuBackground;
+            setMainMenuBackground(data.settings.mainMenuBackground);
+        }
+        saveData();
+        updateSettingsUI();
+    }
+    document.getElementById('spellingInterval').addEventListener('change',(e)=>{ data.settings.spellingInterval=parseInt(e.target.value)||5; saveData(); updateSettingsUI(); });
+    function exportData(){ let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)])); a.download=`backup_${Date.now()}.json`; a.click(); }
+    function importData(input){ let f=input.files[0]; if(!f) return; let r=new FileReader(); r.onload=e=>{ try{ let d=JSON.parse(e.target.result); if(confirm('覆盖当前数据？')){ data=d; if(!data.settings) data.settings={spellingEnabled:false,spellingInterval:5,reviewEnabled:true,backgrounds:[],currentBgIndex:0, mainMenuBackground:false}; if(!data.settings.backgrounds) data.settings.backgrounds=[...DEFAULT_BG]; initDailyStats(); saveData(); showMainMenu(); showNotification('导入成功'); } }catch(e){ showNotification('文件错误'); } }; r.readAsText(f); }
+    function clearAllData(){ if(confirm('永久清空所有数据？')){ data={wordbooks:[],settings:{spellingEnabled:false,spellingInterval:5,reviewEnabled:true,backgrounds:[...DEFAULT_BG],currentBgIndex:0, mainMenuBackground:false}, dailyStats:null}; initDailyStats(); saveData(); showMainMenu(); } }
+    function saveBackgroundEdit(){ closeModal('editBackgroundModal'); }
+    
+    // 主题切换
+    function initTheme(){ 
+        const savedTheme = localStorage.getItem('haoxiang_theme');
+        if(savedTheme === 'dark') document.body.classList.add('dark-mode');
+        const themeBtn = document.getElementById('themeToggleBtn');
+        themeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('haoxiang_theme', isDark ? 'dark' : 'light');
+        });
+    }
+    
+    // 初始化单词卡滑动事件（全局一次）
+    function initFlashcardTouchEvents() {
+        const flashcardEl = document.getElementById('flashcardMode');
+        if (!flashcardEl) return;
+        flashcardEl.addEventListener('touchstart', function(e) {
+            if (e.target.closest('button')) return;
+            flashcardTouchStartX = e.touches[0].clientX;
+            flashcardTouchStartY = e.touches[0].clientY;
+        }, { passive: true });
+        flashcardEl.addEventListener('touchend', function(e) {
+            if (e.target.closest('button')) return;
+            if (flashcardTouchStartX === 0) return;
+            const diffX = e.changedTouches[0].clientX - flashcardTouchStartX;
+            const diffY = e.changedTouches[0].clientY - flashcardTouchStartY;
+            if (Math.abs(diffX) > 50 && Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0) prevFlashcard();
+                else nextFlashcard();
+            }
+            flashcardTouchStartX = 0;
+            flashcardTouchStartY = 0;
+        }, { passive: true });
+    }
+
+    // 拼写输入框回车支持
+    function initSpellingEnterKey() {
+        const input = document.getElementById('spellingInput');
+        if (!input) return;
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (document.getElementById('spellingButtons').style.display !== 'none') {
+                    checkSpelling();
+                } else if (!document.getElementById('spellingRetryButtons').classList.contains('hidden')) {
+                    retrySpelling();
+                }
+            }
+        });
+    }
+
+    // 启动
+    loadData();
+    initBackgrounds();
+    initDailyStats();
+    initTheme();
+    renderWordbooks();
+    updateSettingsUI();
+    renderBackgrounds();
+    initFlashcardTouchEvents();
+    initSpellingEnterKey();
+    if(window.speechSynthesis){ 
+        window.speechSynthesis.onvoiceschanged=()=>{ 
+            let voices=window.speechSynthesis.getVoices(); 
+            preferredVoice=voices.find(v=>v.lang==='en-US'); 
+        }; 
+    }
+    document.addEventListener('click',()=>activateSpeech(),{once:true});
+</script>
+</body>
+</html>
+</html>
